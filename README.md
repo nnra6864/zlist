@@ -1,4 +1,4 @@
-# zlist [![](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge.svg)](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge) || [![](https://img.shields.io/badge/zig-0.16.0_dev.2261+d6b3dd25a-green.svg)](https://img.shields.io/badge/zig-0.16.0_dev.2261+d6b3dd25a-green)
+# zlist [![](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge.svg)](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge)  [![](https://img.shields.io/badge/zig-0.16.0_dev.2261+d6b3dd25a-green.svg)](https://img.shields.io/badge/zig-0.16.0_dev.2261+d6b3dd25a-green)
 
 A modern, high-performance alternative to ls, written in Zig.
 
