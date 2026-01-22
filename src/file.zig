@@ -8,8 +8,14 @@ pub const File = struct {
     is_hidden: bool,
     name: []const u8,
 
-    pub fn init(entry: *const std.Io.Dir.Entry) Self {
+    /// Initialize a File from a directory entry. Return null for hidden files(temporarily).
+    pub fn init(entry: *const std.Io.Dir.Entry) ?Self {
         const is_dir: bool = (entry.kind == .directory);
+        const is_hidden: bool = (entry.name[0] == '.');
+
+        if (is_hidden) {
+            return null;
+        }
 
         return .{
             .is_hidden = (entry.name[0] == '.'),
