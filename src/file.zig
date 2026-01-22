@@ -40,20 +40,18 @@ pub const File = struct {
         const white = "\x1b[37m";
     };
 
-    pub fn getColor(self: Self) []const u8 {
+    pub inline fn getColor(self: Self) []const u8 {
+        // TODO: add more colors based on file type
         if (self.is_dir) {
-            // 普通蓝色 (文件夹)
+            // blue (directory)
             return Color.light_blue;
-        } else if (self.is_exec) {
-            // 黄色 (可执行)
-            return Color.light_green;
         } else {
-            // 黄色
+            // default file color
             return Color.light_yellow;
         }
     }
 
-    pub fn getIcon(self: Self) []const u8 {
+    pub inline fn getIcon(self: Self) []const u8 {
         if (self.is_dir) {
             return " ";
         } else {
@@ -65,6 +63,24 @@ pub const File = struct {
                 return " ";
             } else if (std.mem.endsWith(u8, self.name, ".json")) {
                 return " ";
+            } else if (std.mem.endsWith(u8, self.name, ".md")) {
+                return " ";
+            } else if (std.mem.endsWith(u8, self.name, ".py")) {
+                return " ";
+            } else if (std.mem.endsWith(u8, self.name, ".toml")) {
+                return " ";
+            } else if (std.mem.endsWith(u8, self.name, ".yaml")) {
+                return " ";
+            } else if (std.mem.endsWith(u8, self.name, ".js")) {
+                return " ";
+            } else if (std.mem.endsWith(u8, self.name, ".ts")) {
+                return " ";
+            } else if (std.mem.endsWith(u8, self.name, ".html")) {
+                return " ";
+            } else if (std.mem.endsWith(u8, self.name, ".css")) {
+                return " ";
+            } else if (std.mem.endsWith(u8, self.name, ".java")) {
+                return " ";
             }
 
             // default file icon

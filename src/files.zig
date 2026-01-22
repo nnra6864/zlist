@@ -30,7 +30,7 @@ pub const Files = struct {
         }
 
         // sort files by name
-        mem.sortUnstable(file.File, files.items, {}, file.File.nameLessThan);
+        // mem.sortUnstable(file.File, files.items, {}, file.File.nameLessThan);
 
         return .{
             .allocator = allocator,
@@ -69,7 +69,7 @@ pub const Files = struct {
     }
 
     /// get terminal width
-    fn getTerminalWidth(self: Self) usize {
+    inline fn getTerminalWidth(self: Self) usize {
         var winsize = std.mem.zeroes(std.posix.winsize);
         if (std.c.ioctl(self.handle, std.c.T.IOCGWINSZ, @intFromPtr(&winsize)) == 0) {
             return winsize.col;
@@ -80,7 +80,7 @@ pub const Files = struct {
     }
 
     /// get max display length of file names, including icons
-    fn getMaxDisplayLen(self: Self) usize {
+    inline fn getMaxDisplayLen(self: Self) usize {
         var max_len: usize = 0;
         for (self.items.items) |val| {
             const curr_len = val.name.len + val.getIcon().len;
