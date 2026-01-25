@@ -6,14 +6,27 @@ const file = @import("file.zig");
 pub const Files = struct {
     const Self = @This();
 
+    pub const Options = struct {
+        /// is show detail mode
+        is_detail: bool = false,
+        /// show hidden files
+        show_hidden: bool = false,
+    };
+
     allocator: mem.Allocator,
     io: std.Io,
     items: std.ArrayList(file.File),
     stdout: *std.Io.Writer,
     handle: std.Io.File.Handle,
+    opt: Options,
 
     /// init a Files from a directory
-    pub fn init(allocator: mem.Allocator, io: std.Io, dir: std.Io.Dir) !Self {
+    pub fn init(
+        allocator: mem.Allocator,
+        io: std.Io,
+        dir: std.Io.Dir,
+        opt: Options,
+    ) !Self {
         // stdout
         var stdout_buf: [1024]u8 = undefined;
         const stdout_file = std.Io.File.stdout();
@@ -25,7 +38,7 @@ pub const Files = struct {
 
         var it = dir.iterate();
         while (try it.next(io)) |entry| {
-            const fs = file.File.init(&entry) orelse continue;
+            const fs = file.File.init(&entry, opt.show_hidden) orelse continue;
             try files.append(allocator, fs);
         }
 
@@ -38,6 +51,7 @@ pub const Files = struct {
             .items = files,
             .stdout = stdout,
             .handle = stdout_file.handle,
+            .opt = opt,
         };
     }
 

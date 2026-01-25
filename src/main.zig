@@ -11,7 +11,7 @@ pub fn main() !void {
     const cwd = std.Io.Dir.cwd();
     const dir = try cwd.openDir(io, ".", .{ .iterate = true });
 
-    var files = try fs.Files.init(allocator, io, dir);
+    var files = try fs.Files.init(allocator, io, dir, .{});
     defer files.deinit();
 
     try files.list();
