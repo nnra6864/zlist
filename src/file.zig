@@ -8,21 +8,50 @@ pub const File = struct {
     is_hidden: bool,
     name: []const u8,
 
-    /// Initialize a File from a directory entry. Returns null if the entry is hidden and show_hidden is false.
-    pub inline fn init(entry: *const std.Io.Dir.Entry, show_hidden: bool) ?Self {
+    size: u64,
+    /// Last modification time in nanoseconds, relative to UTC 1970-01-01.
+    mtime: ?std.Io.Timestamp,
+
+    pub const Options = struct {
+        /// show detail mode
+        show_detail: bool = false,
+        /// show hidden files
+        show_hidden: bool = false,
+        sub_path: []const u8 = ".",
+    };
+
+    /// Initialize a File from a directory entry.
+    /// Return null if the file should be skipped (e.g., hidden files when not showing hidden).
+    pub inline fn init(
+        io: std.Io,
+        entry: *const std.Io.Dir.Entry,
+        dir: *const std.Io.Dir,
+        opt: Options,
+    ) !?Self {
         const is_dir: bool = (entry.kind == .directory);
         const is_hidden: bool = (entry.name[0] == '.');
 
-        if (!show_hidden and is_hidden) {
+        if (!opt.show_hidden and is_hidden) {
             return null;
         }
 
-        return .{
+        var file: Self = .{
             .is_hidden = is_hidden,
             .is_dir = is_dir,
             .is_exec = false,
             .name = entry.name,
+            .size = 0,
+            .mtime = null,
         };
+
+        if (opt.show_detail) {
+            // read more file details
+            const stat = try dir.statFile(io, opt.sub_path, .{});
+            file.size = stat.size;
+            file.mtime = stat.mtime;
+        }
+
+        return file;
     }
 
     pub fn nameLessThan(_: void, lhs: Self, rhs: Self) bool {
@@ -49,48 +78,5 @@ pub const File = struct {
             // default file color
             return Color.light_yellow;
         }
-    }
-
-    pub inline fn getIcon(self: Self) []const u8 {
-        if (self.is_dir) {
-            return " ";
-        } else {
-            if (std.mem.endsWith(u8, self.name, ".zig")) {
-                return " ";
-            } else if (std.mem.endsWith(u8, self.name, ".go")) {
-                return " ";
-            } else if (std.mem.endsWith(u8, self.name, ".c")) {
-                return " ";
-            } else if (std.mem.endsWith(u8, self.name, ".json")) {
-                return " ";
-            } else if (std.mem.endsWith(u8, self.name, ".md")) {
-                return " ";
-            } else if (std.mem.endsWith(u8, self.name, ".py")) {
-                return " ";
-            } else if (std.mem.endsWith(u8, self.name, ".toml")) {
-                return " ";
-            } else if (std.mem.endsWith(u8, self.name, ".yaml")) {
-                return " ";
-            } else if (std.mem.endsWith(u8, self.name, ".js")) {
-                return " ";
-            } else if (std.mem.endsWith(u8, self.name, ".ts")) {
-                return " ";
-            } else if (std.mem.endsWith(u8, self.name, ".html")) {
-                return " ";
-            } else if (std.mem.endsWith(u8, self.name, ".css")) {
-                return " ";
-            } else if (std.mem.endsWith(u8, self.name, ".java")) {
-                return " ";
-            }
-
-            // default file icon
-            return " ";
-        }
-    }
-
-    ///  Print a single file item to the provided writer.
-    pub inline fn print_single_item(self: Self, writer: *std.Io.Writer, max_display_len: usize) !void {
-        const icon = self.getIcon();
-        try writer.print("  {s}{s} {s:<[3]}\x1b[0m", .{ self.getColor(), icon, self.name, max_display_len - icon.len + 1 });
     }
 };
