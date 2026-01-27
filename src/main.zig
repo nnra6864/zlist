@@ -5,8 +5,7 @@ var threaded: std.Io.Threaded = .init_single_threaded;
 const io = threaded.io();
 
 pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    const allocator = gpa.allocator();
+    const allocator = std.heap.page_allocator;
 
     const cwd = std.Io.Dir.cwd();
     const dir = try cwd.openDir(io, ".", .{ .iterate = true });
