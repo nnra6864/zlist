@@ -17,7 +17,6 @@ pub const Files = struct {
     allocator: mem.Allocator,
     io: std.Io,
     items: std.ArrayList(file.File),
-    icon_map: std.StringHashMap([]const u8),
     opt: Options,
 
     /// init a Files from a directory
@@ -40,47 +39,16 @@ pub const Files = struct {
         // sort files by name
         // mem.sortUnstable(file.File, files.items, {}, file.File.nameLessThan);
 
-        // init icon hash table
-        var icon_map = std.StringHashMap([]const u8).init(allocator);
-        errdefer icon_map.deinit();
-        {
-            try icon_map.put(".zig", " ");
-            try icon_map.put(".go", " ");
-            try icon_map.put(".rs", " ");
-            try icon_map.put(".c", " ");
-            try icon_map.put(".cpp", " ");
-            try icon_map.put(".h", " ");
-            try icon_map.put(".js", " ");
-            try icon_map.put(".ts", " ");
-            try icon_map.put(".py", " ");
-            try icon_map.put(".java", " ");
-            try icon_map.put(".md", " ");
-            try icon_map.put(".txt", " ");
-            try icon_map.put(".json", "{}");
-            try icon_map.put(".yaml", " ");
-            try icon_map.put(".yml", " ");
-            try icon_map.put(".xml", " ");
-            try icon_map.put(".toml", " ");
-            try icon_map.put(".sh", " ");
-            try icon_map.put(".html", " ");
-            try icon_map.put(".css", " ");
-            // default icon for unknown file
-            try icon_map.put("", " ");
-            try icon_map.put(".", " ");
-        }
-
         return .{
             .allocator = allocator,
             .io = io,
             .items = files,
-            .icon_map = icon_map,
             .opt = opt,
         };
     }
 
     pub fn deinit(self: *Self) void {
         self.items.deinit(self.allocator);
-        self.icon_map.deinit();
     }
 
     /// list files in simple mode
@@ -101,7 +69,7 @@ pub const Files = struct {
         }
 
         for (self.items.items, 0..) |val, i| {
-            const icon = self.getIcon(val);
+            const icon = self.getIcon(val.is_dir, val.name);
 
             // print item
             try stdout.print("  {s}{s} {s:<[3]}\x1b[0m", .{ val.getColor(), icon, val.name, max_display_len - icon.len + 1 });
@@ -131,7 +99,7 @@ pub const Files = struct {
     inline fn getMaxDisplayLen(self: Self) usize {
         var max_len: usize = 0;
         for (self.items.items) |val| {
-            const curr_len = val.name.len + self.getIcon(val).len;
+            const curr_len = val.name.len + self.getIcon(val.is_dir, val.name).len;
 
             if (curr_len > max_len) {
                 max_len = curr_len;
@@ -141,19 +109,39 @@ pub const Files = struct {
         return max_len;
     }
 
-    /// get icon for a file system entry
-    inline fn getIcon(self: Self, fs: file.File) []const u8 {
-        if (fs.is_dir) {
+    inline fn getIcon(_: Self, is_dir: bool, name: []const u8) []const u8 {
+        if (is_dir) {
             return " ";
+        }
+
+        const ext = std.fs.path.extension(name);
+        if (std.mem.eql(u8, ext, ".zig")) {
+            return " ";
+        } else if (std.mem.eql(u8, ext, ".go")) {
+            return " ";
+        } else if (std.mem.eql(u8, ext, ".rs")) {
+            return " ";
+        } else if (std.mem.eql(u8, ext, ".c")) {
+            return " ";
+        } else if (std.mem.eql(u8, ext, ".cpp")) {
+            return " ";
+        } else if (std.mem.eql(u8, ext, ".h")) {
+            return " ";
+        } else if (std.mem.eql(u8, ext, ".js")) {
+            return " ";
+        } else if (std.mem.eql(u8, ext, ".ts")) {
+            return " ";
+        } else if (std.mem.eql(u8, ext, ".py")) {
+            return " ";
+        } else if (std.mem.eql(u8, ext, ".java")) {
+            return " ";
+        } else if (std.mem.eql(u8, ext, ".md")) {
+            return " ";
+        } else if (std.mem.eql(u8, ext, ".txt")) {
+            return " ";
         } else {
-            const ext = std.fs.path.extension(fs.name);
-            const icon = self.icon_map.get(ext);
-            if (icon) |icon_val| {
-                return icon_val;
-            } else {
-                // default file icon
-                return " ";
-            }
+            // default file icon
+            return " ";
         }
     }
 
@@ -178,7 +166,7 @@ pub const Files = struct {
                 val.groupname,
                 try val.humanSize(&size_buf),
                 try val.formatTime(&time_buf),
-                self.getIcon(val),
+                self.getIcon(val.is_dir, val.name),
                 val.name,
             });
         }
