@@ -35,14 +35,17 @@ pub fn main(init: std.process.Init) !void {
     var show_detail: bool = false;
     var path: []const u8 = ".";
 
+    // process parsed args
     if (res.args.help != 0) {
         // show hellp msg
         std.debug.print("{s}\n", .{params_desc});
         return;
-    } else if (res.args.long != 0) {
+    }
+    if (res.args.long != 0) {
         // set long listing mode
         show_detail = true;
-    } else if (res.args.a != 0) {
+    }
+    if (res.args.a != 0) {
         // show hidden files
         show_hidden = true;
     }
@@ -54,6 +57,7 @@ pub fn main(init: std.process.Init) !void {
 
     const cwd = std.Io.Dir.cwd();
     const dir = try cwd.openDir(io, path, .{ .iterate = true });
+    defer dir.close(io);
 
     var files = try fs.Files.init(allocator, io, dir, .{ .show_detail = show_detail, .show_hidden = show_hidden });
     defer files.deinit();

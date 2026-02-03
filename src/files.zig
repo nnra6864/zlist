@@ -12,6 +12,8 @@ pub const Files = struct {
         show_detail: bool = false,
         /// show hidden files
         show_hidden: bool = false,
+        /// show recursive
+        show_recursive: bool = false,
     };
 
     allocator: mem.Allocator,
