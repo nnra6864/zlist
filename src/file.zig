@@ -67,6 +67,10 @@ pub const File = struct {
         return std.ascii.orderIgnoreCase(lhs.name, rhs.name) == .lt;
     }
 
+    pub fn nameLenLessThan(_: void, lhs: Self, rhs: Self) bool {
+        return lhs.name.len < rhs.name.len;
+    }
+
     const Color = struct {
         const reset = "\x1b[0m";
         const light_blue = "\x1b[94m";

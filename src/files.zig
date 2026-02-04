@@ -14,6 +14,8 @@ pub const Files = struct {
         show_hidden: bool = false,
         /// show recursive
         show_recursive: bool = false,
+        /// sort type: 0=name(asc), 1=name length(asc)
+        sort_type: u8 = 0,
     };
 
     allocator: mem.Allocator,
@@ -43,8 +45,16 @@ pub const Files = struct {
             try files.append(allocator, fs);
         }
 
-        // sort files by name
-        // mem.sortUnstable(file.File, files.items, {}, file.File.nameLessThan);
+        switch (opt.sort_type) {
+            1 => {
+                // sort by name length
+                mem.sortUnstable(file.File, files.items, {}, file.File.nameLenLessThan);
+            },
+            else => {
+                // sort by name ascending
+                mem.sortUnstable(file.File, files.items, {}, file.File.nameLessThan);
+            },
+        }
 
         return .{
             .allocator = allocator,

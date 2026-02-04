@@ -1,73 +1,102 @@
-# zlist [![](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge.svg)](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge)  [![](https://img.shields.io/badge/zig-0.16.0_dev.2368+380ea6fb5-green.svg)](https://img.shields.io/badge/zig-0.16.0_dev.2368+380ea6fb5-green)
+# zlist ⚡️
 
-A modern, high-performance alternative to ls, written in Zig.
+> A lightweight, modern alternative to `ls` built with **Zig**.
 
-**(The timing maybe is just not right. I need more time to work on this tiny project.)**
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square)](https://github.com/here-Leslie-Lau/zlist)
+[![Zig Version](https://img.shields.io/badge/zig-0.16.0_dev-orange?style=flat-square)](https://ziglang.org/)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
-## Screenshots
+**zlist** isn't just another file lister. It's designed to be fast, minimal, and visually pleasing right out of the box. No complex configurations—just compile and go.
 
-![list](pics/screenshot.jpg)
+## ✨ Why zlist?
 
-![list-with-detail](pics/screenshot2.jpg)
+*   **Blazing Fast**: Written in Zig, it starts up instantly and creates zero garbage.
+*   **Visual Context**:
+    *   **Nerd Fonts** support included by default.
+    *   File-type specific icons for `Zig`, `Rust`, `Go`, `Python`, `JS/TS`, `C/C++`, and more.
+    *   Special highlighting for directories (Blue) and Markdown files (Magenta).
+*   **Smart Details**: All the info you need (`permissions`, `user`, `group`, `size`, `time`) formatted for humans, not machines.
+*   **Unique Sorting**: Sort by filename or **filename length** (because sometimes short names are harder to find).
 
-## Features
-- **Fast**: Written in Zig for high performance.
-- **Colorful**: Color-coded output for different file types.
-- **Detailed**: View file permissions, owner, group, size, and modification time.
-- **Icons**: File type icons for better visual recognition (Requires a Nerd Font).
-- **Flexible**: Supports standard `ls` flags like `-a` (all files) and `-l` (long listing).
+## 📸 Preview
 
-## Usage
+![Preview1](pics/screenshot.jpg)
+![Preview2](pics/screenshot2.jpg)
 
-```bash
-ls -h
--h, --help    Usage: ls [OPTIONS: -l -a] [Directory]
--l, --long    List files in the long format.
--a, --a       Include directory entries whose names begin with a dot (‘.’).
-<str>...
-```
+*(Make sure you have a [Nerd Font](https://www.nerdfonts.com/) installed in your terminal to see the icons!)*
 
-## Installation
+## 🚀 Installation
 
-### Download precompiled binary
+### Precompiled Binaries
 
-**TODO**
+*TODO, coming soon!*
 
-You can download the latest precompiled binary from the [releases page]().
+### From Source
 
-### Build from source
+Requirements: `zig` (master/0.16.0-dev recommended).
 
 ```bash
-git clone --recursive https://github.com/here-Leslie-Lau/zlist.git && cd zlist
-zig build -Doptimize=ReleaseSafe
-```
+# 1. Clone the repo
+git clone --recursive https://github.com/here-Leslie-Lau/zlist.git
+cd zlist
 
-Then, move the compiled binary (In `zig-out/bin`) to a directory in your PATH, e.g., `/usr/local/bin`.
+# 2. Build in release mode [ReleaseFast, ReleaseSafe, ReleaseSmall]
+zig build -Doptimize=ReleaseFast
 
-Or you can run it directly:
-
-```bash
+# 3. Run it. (Optional: add to PATH, it's up to you.)
 ./zig-out/bin/ls
 ```
 
-## Contributing
+## 🛠 Usage
 
-Contributions are welcome! Please feel free to:
-- Report bugs via [Issues](https://github.com/here-Leslie-Lau/zlist/issues)
-- Submit [Pull Requests](https://github.com/here-Leslie-Lau/zlist/pulls)
-- Suggest new features or improvements
+Simple and intuitive.
 
-## Roadmap
+```bash
+ls [OPTIONS] [PATH]
+```
 
-- [X] Support basic options (-a, -l)
-- [X] Support specific path to list
-- [X] Colorized output
-- [X] File icons support
-- [X] Detailed file information (permissions, user/group, size, time)
-- [ ] Precompile binaries for major platforms
-- [ ] Support recursive options (-R)
-- [ ] Support more sorting options
+| Flag | Description |
+| :--- | :--- |
+| `-l`, `--long` | Enable detailed view (permissions, size, date, user). |
+| `-a`, `--a` | Show hidden files (starting with `.`). |
+| `-s`, `--sort <mode>` | **0**: Name (A-Z) [Default]<br>**1**: Name Length (Shortest first) |
+| `-h`, `--help` | Print help message. |
 
-## License
+### Examples
 
-This project is open source. See the LICENSE file for details.
+**Standard list:**
+```bash
+ls
+```
+
+**Show everything with details:**
+```bash
+ls -la
+```
+
+**Find short filenames easily (Sort by length):**
+```bash
+ls -s 1
+```
+
+## 🛣 Roadmap
+
+*   [x] Basic file listing & recursion
+*   [x] Color output & Nerd Font icons
+*   [x] Detailed file stats
+*   [x] Sorting by name length
+*   [ ] Recursive directory traversal (`-R`)
+
+## 🤝 Contributing
+
+Got an idea? Found a bug? Feel free to open an issue or drop a PR. This is a fun side project, and all contributions are welcome.
+
+1.  Fork it
+2.  Create your feature branch (`git checkout -b feature/cool-thing`)
+3.  Commit your changes
+4.  Push to the branch
+5.  Open a Pull Request
+
+---
+
+*Crafted with ❤️ in Zig.*
