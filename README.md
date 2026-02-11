@@ -1,22 +1,26 @@
 # zlist ⚡️
 
-> A lightweight, modern alternative to `ls` built with **Zig**.
+> A simple, colorful alternative to `ls` built with **Zig**.
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square)](https://github.com/here-Leslie-Lau/zlist)
 [![Zig Version](https://img.shields.io/badge/zig-0.16.0_dev-orange?style=flat-square)](https://ziglang.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
-**zlist** isn't just another file lister. It's designed to be fast, minimal, and visually pleasing right out of the box. No complex configurations—just compile and go.
+**Note**: This is my **first CLI tool written in Zig**! 🚀
 
-## ✨ Why zlist?
+I built this project to learn the language, understand manual memory management, and explore the standard library. It may not be the fastest or smallest `ls` clone out there (yet!), but it's a functional experiment and a work in progress.
 
-*   **Blazing Fast**: Written in Zig, it starts up instantly and creates zero garbage.
+## ✨ Features
+
+While it's a learning project, it still comes with some nice touches:
+
 *   **Visual Context**:
     *   **Nerd Fonts** support included by default.
     *   File-type specific icons for `Zig`, `Rust`, `Go`, `Python`, `JS/TS`, `C/C++`, and more.
-    *   Special highlighting for directories (Blue) and Markdown files (Magenta).
-*   **Smart Details**: All the info you need (`permissions`, `user`, `group`, `size`, `time`) formatted for humans, not machines.
+    *   Special highlighting for directories and Markdown files.
+*   **Smart Details**: Permissions, user/group, sizes, and times formatted for humans.
 *   **Unique Sorting**: Sort by filename or **filename length** (because sometimes short names are harder to find).
+*   **Recursive**: basic `-r` support to dig into directories.
 
 ## 📸 Preview
 
