@@ -5,6 +5,9 @@ const builtin = @import("builtin");
 
 const opts = @import("opts.zig");
 
+const size_units = [_][]const u8{ "B", "K", "M", "G", "T" };
+const month_names = [_][]const u8{ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
 pub const File = struct {
     const Self = @This();
     is_dir: bool,
@@ -156,15 +159,13 @@ pub const File = struct {
 
     /// convert size in bytes to human-readable format
     pub inline fn humanSize(self: Self, buf: []u8) ![]u8 {
-        const units = [_][]const u8{ "B", "K", "M", "G", "T" };
-
         var sz: f64 = @floatFromInt(self.stat.?.size);
         var i: usize = 0;
-        while (sz >= 1024.0 and i < units.len - 1) : (i += 1) {
+        while (sz >= 1024.0 and i < size_units.len - 1) : (i += 1) {
             sz /= 1024.0;
         }
 
-        return std.fmt.bufPrint(buf, "{d:.1}{s}", .{ sz, units[i] });
+        return std.fmt.bufPrint(buf, "{d:.1}{s}", .{ sz, size_units[i] });
     }
 
     /// format modification time to string
@@ -181,7 +182,7 @@ pub const File = struct {
         const hour = day_seconds.getHoursIntoDay();
         const min = day_seconds.getMinutesIntoHour();
         const sec = day_seconds.getSecondsIntoMinute();
-        const month_names = [_][]const u8{ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
         //  %b %d %H:%M:%S %Y in C Language
         return std.fmt.bufPrint(buf, "{s} {d:0>2} {d:0>2}:{d:0>2}:{d:0>2} UTC {d}", .{
             month_names[month_index],
