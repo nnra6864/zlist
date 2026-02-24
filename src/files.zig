@@ -305,7 +305,7 @@ pub const Files = struct {
                 };
                 defer sub_dir.close(self.io);
 
-                var sub_arena = std.heap.ArenaAllocator.init(self.allocator);
+                var sub_arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
                 defer sub_arena.deinit();
 
                 var sub_files = try Files.init(
@@ -314,7 +314,6 @@ pub const Files = struct {
                     sub_dir,
                     self.opt,
                 );
-                errdefer sub_files.deinit();
 
                 // recursive itself
                 const child_connector = if (is_last) "    " else "│   ";
@@ -323,8 +322,6 @@ pub const Files = struct {
                 const new_prefix = try std.fmt.bufPrint(&buf, "{s}{s}", .{ prefix, child_connector });
 
                 try sub_files.listRecursive(term, new_prefix, false, sub_dir, pure);
-
-                sub_files.deinit();
             }
         }
     }
