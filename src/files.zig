@@ -314,7 +314,7 @@ pub const Files = struct {
                     sub_dir,
                     self.opt,
                 );
-                defer sub_files.deinit();
+                errdefer sub_files.deinit();
 
                 // recursive itself
                 const child_connector = if (is_last) "    " else "│   ";
@@ -323,6 +323,8 @@ pub const Files = struct {
                 const new_prefix = try std.fmt.bufPrint(&buf, "{s}{s}", .{ prefix, child_connector });
 
                 try sub_files.listRecursive(term, new_prefix, false, sub_dir, pure);
+
+                sub_files.deinit();
             }
         }
     }
