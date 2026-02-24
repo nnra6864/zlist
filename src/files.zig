@@ -298,7 +298,11 @@ pub const Files = struct {
             }
 
             if (val.is_dir) {
-                const sub_dir = try dir.openDir(self.io, val.name, .{ .iterate = true });
+                const sub_dir = dir.openDir(self.io, val.name, .{ .iterate = true }) catch |err| {
+                    // print error message and continue
+                    try term.writer.print("\x1b[31mzl: cannot open directory '{s}': {any}\x1b[0m\n", .{ val.name, err });
+                    continue;
+                };
                 defer sub_dir.close(self.io);
 
                 var sub_arena = std.heap.ArenaAllocator.init(self.allocator);
