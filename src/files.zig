@@ -301,8 +301,11 @@ pub const Files = struct {
                 const sub_dir = try dir.openDir(self.io, val.name, .{ .iterate = true });
                 defer sub_dir.close(self.io);
 
+                var sub_arena = std.heap.ArenaAllocator.init(self.allocator);
+                defer sub_arena.deinit();
+
                 var sub_files = try Files.init(
-                    self.allocator,
+                    sub_arena.allocator(),
                     self.io,
                     sub_dir,
                     self.opt,
