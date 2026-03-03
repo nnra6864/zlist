@@ -25,8 +25,8 @@ While it's a learning project, it still packs some handy features:
 
 ## 📸 Preview
 
-![Preview1](pics/screenshot.jpg)
-![Preview2](pics/screenshot2.jpg)
+![Preview1](pics/screenshot.png)
+![Preview2](pics/screenshot2.png)
 
 *(Make sure you have a [Nerd Font](https://www.nerdfonts.com/) installed in your terminal to see the icons!)*
 
