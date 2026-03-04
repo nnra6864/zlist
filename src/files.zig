@@ -103,10 +103,6 @@ pub const Files = struct {
     }
 
     pub fn deinit(self: *Self) void {
-        for (self.items.items) |item| {
-            self.allocator.free(item.name);
-        }
-
         self.items.deinit(self.allocator);
     }
 
