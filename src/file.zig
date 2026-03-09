@@ -246,13 +246,13 @@ pub const File = struct {
             return std.fmt.bufPrint(buf, "?B", .{});
         }
 
-        var sz: f64 = @floatFromInt(self.stat_t.?.size);
+        var size = self.stat_t.?.size;
         var i: usize = 0;
-        while (sz >= 1024.0 and i < size_units.len - 1) : (i += 1) {
-            sz /= 1024.0;
+        while (i < size_units.len - 1 and size >= 1024) : (i += 1) {
+            size = size / 1024;
         }
 
-        return std.fmt.bufPrint(buf, "{d:.1}{s}", .{ sz, size_units[i] });
+        return std.fmt.bufPrint(buf, "{d}{s}", .{ size, size_units[i] });
     }
 
     /// format modification time to string
