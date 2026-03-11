@@ -20,7 +20,7 @@ While it's a learning project, it still packs some handy features:
     *   Specific icons for your code (`Zig`, `Rust`, `Go`, `Python`, `JS/TS`, `C/C++`, etc.).
     *   Highlights directories and Markdown files so you spot them instantly.
 *   **Smart Details**: Permissions, user/group, sizes, and timestamps formatted to be actually readable.
-*   **Unique Default Sorting**: Defaults to sorting by **filename length** (because finding that one short file in a sea of long names is always a pain). Standard A-Z sorting is also available.
+*   **Sorting**: Default sorting is A-Z (name), with option to sort by **filename length**.
 *   **Dig Deeper**: A basic `-r` flag to peek into subdirectories, Or `-L` to control how deep you want to go.
 *   **Filters**: Quickly isolate just directories (`-d`) or just files (`-D`).
 *   **Summary Report**: Use `-R` to see a quick count of files and folders after listing.
@@ -68,7 +68,7 @@ zl [OPTIONS] [PATH]
 | :--- | :--- |
 | `-l`, `--long` | Enable detailed view (permissions, size, date, user). |
 | `-a`, `--a` | Show hidden files (starting with `.`). |
-| `-s`, `--sort <mode>` | `length` (Shortest first) [Default]<br>`name` (A-Z) |
+| `-s`, `--sort <mode>` | `name` (A-Z) [Default]<br>`length` (Shortest first) |
 | `-r`, `--recursive` | Recursively list subdirectories encountered. |
 | `-L`, `--level <INT>` | Limit the depth of recursion (use `0` for infinite depth). |
 | `-p`, `--pure` | Clean output without colors or icons (useful for pipes). |
@@ -84,9 +84,9 @@ zl [OPTIONS] [PATH]
 zl
 ```
 
-**Show everything with details (Sorted by name):**
+**Show everything with details (Sorted by filename length):**
 ```bash
-zl -la -s name
+zl -la -s length
 ```
 
 **Dig deep (Recursive listing):**
@@ -119,7 +119,7 @@ zl -R
 *   [x] Basic file listing & recursion
 *   [x] Color output & Nerd Font icons
 *   [x] Detailed file stats
-*   [x] Sorting by name length
+*   [x] Sorting by name (default) and length
 *   [x] Recursive directory traversal (`-r`)
 *   [x] Depth control for recursion (`-L`)
 *   [x] Clean output mode (`-p`)

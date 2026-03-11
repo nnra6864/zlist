@@ -110,13 +110,13 @@ pub const Files = struct {
         }
 
         switch (opt.sort_type) {
-            .name => {
-                // sort by name ascending
-                mem.sortUnstable(file.File, files.items, {}, file.File.nameLessThan);
-            },
-            else => {
+            .length => {
                 // sort by name length
                 mem.sortUnstable(file.File, files.items, {}, file.File.nameLenLessThan);
+            },
+            else => {
+                // sort by name ascending
+                mem.sortUnstable(file.File, files.items, {}, file.File.nameLessThan);
             },
         }
 
