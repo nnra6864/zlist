@@ -75,6 +75,8 @@ pub const FileOptions = struct {
     only_dir: bool = false,
     /// only show files, not directories
     only_file: bool = false,
+    /// when true, keep directories during `--match` filtering so recursion can continue.
+    keep_dirs_for_match: bool = false,
     exts: ?[]const []const u8 = null,
     matches: ?[]const []const u8 = null,
 };

@@ -59,7 +59,9 @@ pub const File = struct {
             }
         }
         if (opt.matches) |matches| {
-            if (!shouldIncludeByName(entry.name, matches)) {
+            if (is_dir and opt.keep_dirs_for_match) {
+                // keep directories so recursive traversal can continue
+            } else if (!shouldIncludeByName(entry.name, matches)) {
                 return null;
             }
         }
