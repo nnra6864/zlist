@@ -10,6 +10,17 @@
 
 I built this project to learn Zig, get comfortable with manual memory management, and explore the standard library. It might not be the fastest or smallest `ls` clone (yet), but it's usable today and still getting better.
 
+## Table of Contents
+
+- [Features](#features)
+- [Preview](#preview)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Benchmark](#benchmark)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+
+<a id="features"></a>
 ## ✨ Features
 
 Already pretty capable for a learning project:
@@ -24,6 +35,7 @@ Already pretty capable for a learning project:
 *   **Quick summary report** for file and folder counts.
 *   **Git status indicators** in long view.
 
+<a id="preview"></a>
 ## 📸 Preview
 
 ![Preview1](pics/screenshot.png)
@@ -32,6 +44,7 @@ Already pretty capable for a learning project:
 
 *(Make sure you have a [Nerd Font](https://www.nerdfonts.com/) installed in your terminal to see the icons!)*
 
+<a id="installation"></a>
 ## 🚀 Installation
 
 ### Precompiled Binaries
@@ -56,6 +69,7 @@ zig build -Doptimize=ReleaseFast
 ./zig-out/bin/zl
 ```
 
+<a id="usage"></a>
 ## 🛠 Usage
 
 Just run:
@@ -156,6 +170,22 @@ zl -R
 zl -lg
 ```
 
+<a id="benchmark"></a>
+## Benchmark
+
+Quick check on a directory with 50K files, using plain output only: no icons, no colors, output redirected to `/dev/null`. (I used `hyperfine` for benchmarking)
+
+| Tool | Command | Mean time |
+| :--- | :--- | :--- |
+| `zl` | `zl -p /path > /dev/null` | `41.8 ms ± 0.6 ms` |
+| `eza` | `eza /path > /dev/null` | `180.3 ms ± 2.0 ms` |
+| macOS `/bin/ls` | `/bin/ls /path > /dev/null` | `169.3 ms ± 6.0 ms` |
+
+In this run, `zl` came out about 4x faster than both `eza` and the system `ls`.
+
+*Benchmark results may vary depending on filesystem and hardware.*
+
+<a id="roadmap"></a>
 ## 🛣 Roadmap
 
 *   [x] Basic file listing & recursion
@@ -176,6 +206,7 @@ zl -lg
 *   [ ] Multi-threading for faster `stat` calls
 *   [ ] Custom color/icon configurations (Maybe, if you need it)
 
+<a id="contributing"></a>
 ## 🤝 Contributing
 
 Got an idea? Found a bug? Open an issue or send a PR. This is a fun side project, and contributions are always welcome.
