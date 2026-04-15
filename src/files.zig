@@ -97,6 +97,7 @@ pub const Files = struct {
         var it = dir.iterate();
         while (try it.next(io)) |entry| {
             var fs = (try file.File.init(
+                allocator,
                 &entry,
                 &dir,
                 .{
@@ -114,7 +115,6 @@ pub const Files = struct {
                     .size_range = opt.size_range,
                     .changed_within_now = changed_within_now,
                 },
-                allocator,
                 &username_inventory,
                 &groupname_inventory,
             )) orelse continue;
@@ -244,6 +244,7 @@ pub const Files = struct {
         }
 
         if (try file.File.init(
+            allocator,
             &entry,
             &parent_dir,
             .{
@@ -261,7 +262,6 @@ pub const Files = struct {
                 .size_range = opt.size_range,
                 .changed_within_now = changed_within_now,
             },
-            allocator,
             &username_inventory,
             &groupname_inventory,
         )) |single_file| {
