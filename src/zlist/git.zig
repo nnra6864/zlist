@@ -57,6 +57,8 @@ inline fn parseStatusCode(x: u8, y: u8) GitStatus {
 
 pub inline fn getFileStatuses(allocator: std.mem.Allocator, io: std.Io, path: []const u8) !std.StringHashMap(GitStatus) {
     var m = std.StringHashMap(GitStatus).init(allocator);
+    errdefer deinitFileStatuses(allocator, &m);
+
     const argv = [_][]const u8{
         "git",
         "-C",
@@ -86,12 +88,28 @@ pub inline fn getFileStatuses(allocator: std.mem.Allocator, io: std.Io, path: []
 
         const status = parseStatusCode(x, y);
         if (status != .none) {
+            if (m.getPtr(basename)) |existing| {
+                // Avoid allocating a duplicate key when two changed files share the same basename.
+                existing.* = status;
+                continue;
+            }
+
             const name_cp = try allocator.dupe(u8, basename);
+            errdefer allocator.free(name_cp);
             try m.put(name_cp, status);
         }
     }
 
     return m;
+}
+
+/// Free duplicated git status keys and destroy the map.
+fn deinitFileStatuses(allocator: std.mem.Allocator, m: *std.StringHashMap(GitStatus)) void {
+    var keys = m.keyIterator();
+    while (keys.next()) |key| {
+        allocator.free(key.*);
+    }
+    m.deinit();
 }
 
 test "getFileStatuses" {

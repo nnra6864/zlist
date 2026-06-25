@@ -35,7 +35,10 @@ pub const Files = struct {
         opt: opts.FilesOptions,
     ) !Self {
         var files = try std.ArrayList(file.File).initCapacity(allocator, 32);
-        errdefer files.deinit(allocator);
+        errdefer {
+            deinitItems(allocator, files.items);
+            files.deinit(allocator);
+        }
 
         var max_len: usize = 0;
         var total_folders: usize = 0;
@@ -54,7 +57,14 @@ pub const Files = struct {
             null;
 
         var username_inventory = std.AutoHashMap(std.c.uid_t, []const u8).init(allocator);
+        errdefer deinitCachedNames(std.c.uid_t, allocator, &username_inventory);
+
         var groupname_inventory = std.AutoHashMap(std.c.gid_t, []const u8).init(allocator);
+        errdefer deinitCachedNames(std.c.gid_t, allocator, &groupname_inventory);
+
+        var loaded_git = false;
+        var git_inventory = std.StringHashMap(git.GitStatus).init(allocator);
+        errdefer deinitGitInventory(allocator, &git_inventory);
 
         var it = dir.iterate();
         while (try it.next(io)) |entry| {
@@ -82,10 +92,11 @@ pub const Files = struct {
                 &username_inventory,
                 &groupname_inventory,
             )) orelse continue;
+            errdefer if (fs.symlink_target) |target| allocator.free(target);
 
             // copy name
-            var name: []const u8 = undefined;
-            name = try allocator.dupe(u8, entry.name);
+            const name = try allocator.dupe(u8, entry.name);
+            errdefer allocator.free(name);
             fs.name = name;
 
             if (!opt.show_detail and !opt.recursive) {
@@ -119,8 +130,6 @@ pub const Files = struct {
             }
         }
 
-        var loaded_git = false;
-        var git_inventory = std.StringHashMap(git.GitStatus).init(allocator);
         // git integration is enabled, and current directory is a git repository
         if (opt.show_git and git.isGitRepo(allocator, io, opt.path)) {
             // load git status inventory
@@ -166,7 +175,10 @@ pub const Files = struct {
         };
 
         var files = try std.ArrayList(file.File).initCapacity(allocator, 1);
-        errdefer files.deinit(allocator);
+        errdefer {
+            deinitItems(allocator, files.items);
+            files.deinit(allocator);
+        }
 
         var max_len: usize = 0;
         var total_folders: usize = 0;
@@ -180,7 +192,14 @@ pub const Files = struct {
             null;
 
         var username_inventory = std.AutoHashMap(std.c.uid_t, []const u8).init(allocator);
+        errdefer deinitCachedNames(std.c.uid_t, allocator, &username_inventory);
+
         var groupname_inventory = std.AutoHashMap(std.c.gid_t, []const u8).init(allocator);
+        errdefer deinitCachedNames(std.c.gid_t, allocator, &groupname_inventory);
+
+        var loaded_git = false;
+        var git_inventory = std.StringHashMap(git.GitStatus).init(allocator);
+        errdefer deinitGitInventory(allocator, &git_inventory);
 
         if (try file.File.init(
             allocator,
@@ -207,7 +226,11 @@ pub const Files = struct {
             &groupname_inventory,
         )) |single_file| {
             var item = single_file;
-            item.name = try allocator.dupe(u8, base_name);
+            errdefer if (item.symlink_target) |target| allocator.free(target);
+
+            const name = try allocator.dupe(u8, base_name);
+            errdefer allocator.free(name);
+            item.name = name;
 
             if (!opt.show_detail and !opt.recursive) {
                 max_len = item.name.len + 2;
@@ -224,8 +247,6 @@ pub const Files = struct {
             try files.append(allocator, item);
         }
 
-        var loaded_git = false;
-        var git_inventory = std.StringHashMap(git.GitStatus).init(allocator);
         if (opt.show_git and git.isGitRepo(allocator, io, parent_path)) {
             git_inventory = try git.getFileStatuses(allocator, io, parent_path);
             loaded_git = true;
@@ -256,35 +277,43 @@ pub const Files = struct {
     }
 
     pub fn deinit(self: *Self) void {
+        deinitItems(self.allocator, self.items.items);
+        self.items.deinit(self.allocator);
+
+        deinitCachedNames(std.c.uid_t, self.allocator, &self.username_inventory);
+        deinitCachedNames(std.c.gid_t, self.allocator, &self.groupname_inventory);
+        deinitGitInventory(self.allocator, &self.git_inventory);
+    }
+
+    /// Free owned data stored by each File entry.
+    inline fn deinitItems(allocator: mem.Allocator, items: []file.File) void {
         // Each File owns its copied name and optional symlink target.
-        for (self.items.items) |item| {
-            self.allocator.free(item.name);
+        for (items) |item| {
+            allocator.free(item.name);
             if (item.symlink_target) |target| {
-                self.allocator.free(target);
+                allocator.free(target);
             }
         }
+    }
 
+    /// Free cached owner/group names and destroy the cache.
+    inline fn deinitCachedNames(comptime Key: type, allocator: mem.Allocator, inventory: *std.AutoHashMap(Key, []const u8)) void {
         // Owner names are shared through caches, so free each cached value once.
-        var usernames = self.username_inventory.valueIterator();
-        while (usernames.next()) |username| {
-            self.allocator.free(username.*);
+        var names = inventory.valueIterator();
+        while (names.next()) |name| {
+            allocator.free(name.*);
         }
+        inventory.deinit();
+    }
 
-        var groupnames = self.groupname_inventory.valueIterator();
-        while (groupnames.next()) |groupname| {
-            self.allocator.free(groupname.*);
-        }
-
+    /// Free cached git status keys and destroy the map.
+    inline fn deinitGitInventory(allocator: mem.Allocator, inventory: *std.StringHashMap(git.GitStatus)) void {
         // Git status keys are duplicated when the inventory is loaded.
-        var git_names = self.git_inventory.keyIterator();
-        while (git_names.next()) |name| {
-            self.allocator.free(name.*);
+        var names = inventory.keyIterator();
+        while (names.next()) |name| {
+            allocator.free(name.*);
         }
-
-        self.items.deinit(self.allocator);
-        self.username_inventory.deinit();
-        self.groupname_inventory.deinit();
-        self.git_inventory.deinit();
+        inventory.deinit();
     }
 
     /// Return the collected file entries as a read-only slice.

@@ -473,7 +473,10 @@ pub const File = struct {
 
                 const str = std.mem.span(passwd.?.*.name) orelse return null;
                 const owned_str = allocator.dupe(u8, str) catch return null;
-                ui.put(uid, owned_str) catch return null;
+                ui.put(uid, owned_str) catch {
+                    allocator.free(owned_str);
+                    return null;
+                };
 
                 return owned_str;
             },
@@ -490,7 +493,10 @@ pub const File = struct {
 
                 const str = std.mem.span(group.?.*.name) orelse return null;
                 const owned_str = allocator.dupe(u8, str) catch return null;
-                gi.put(gid, owned_str) catch return null;
+                gi.put(gid, owned_str) catch {
+                    allocator.free(owned_str);
+                    return null;
+                };
 
                 return owned_str;
             },
