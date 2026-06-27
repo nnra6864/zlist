@@ -15,6 +15,7 @@ I built this project to learn Zig, get comfortable with manual memory management
 - [Features](#features)
 - [Preview](#preview)
 - [Installation](#installation)
+- [Use as a Zig Module](#module)
 - [Usage](#usage)
 - [Benchmark](#benchmark)
 - [Roadmap](#roadmap)
@@ -67,6 +68,44 @@ zig build -Doptimize=ReleaseFast
 
 # 3. Run it. (Optional: add to PATH, it's up to you.)
 ./zig-out/bin/zl
+```
+
+<a id="module"></a>
+## Use as a Zig Module
+
+`zlist` can also be used from another Zig project when you want the listing data without the CLI output.
+
+Add it with Zig's package manager:
+
+```bash
+zig fetch --save git+https://github.com/here-Leslie-Lau/zlist
+```
+
+Then expose the module in your `build.zig`:
+
+```zig
+const zlist_dep = b.dependency("zlist", .{
+    .target = target,
+    .optimize = optimize,
+});
+
+exe.root_module.addImport("zlist", zlist_dep.module("zlist"));
+```
+
+Use it from code:
+
+```zig
+const std = @import("std");
+const zlist = @import("zlist");
+
+fn printNames(allocator: std.mem.Allocator, io: std.Io, dir: std.Io.Dir) !void {
+    var files = try zlist.Files.init(allocator, io, dir, .{ .path = "." });
+    defer files.deinit();
+
+    for (files.entries()) |entry| {
+        std.debug.print("{s}\n", .{entry.name});
+    }
+}
 ```
 
 <a id="usage"></a>
@@ -202,7 +241,7 @@ In this run, `zl` came out about 4x faster than both `eza` and the system `ls`.
 *   [x] Summary report (`-R`)
 *   [x] Git status integration (`-g`)
 *   [x] Recursive directory size (`--du`)
-*   [ ] Lib API for embedding in other Zig projects
+*   [x] Lib API for embedding in other Zig projects
 *   [ ] Multi-threading for faster `stat` calls
 *   [ ] Custom color/icon configurations (Maybe, if you need it)
 
