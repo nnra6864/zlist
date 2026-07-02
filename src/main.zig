@@ -1,9 +1,10 @@
 const std = @import("std");
 
 const clap = @import("clap");
+const zlist = @import("zlist");
+
 const cli_args = @import("cli_args.zig");
 const render = @import("render.zig");
-const zlist = @import("zlist");
 
 var threaded: std.Io.Threaded = undefined;
 
@@ -11,6 +12,11 @@ const params_desc: []const u8 = blk: {
     break :blk
     \\-h, --help                 Usage: zl [OPTIONS] [PATH]...
     \\-l, --long                 Show the long view.
+    \\    --no-permissions       Hide permissions from the long view.
+    \\    --no-size              Hide size from the long view.
+    \\    --no-user              Hide user from the long view.
+    \\    --no-group             Hide group from the long view.
+    \\    --no-time              Hide time from the long view.
     \\-a, --a                    Include hidden entries.
     \\    --du                   Show recursive directory size in long view and size sort. This is the sum of file sizes, not the same as `du` disk usage.
     \\-s, --sort <SORTTYPE>      Sort results. Default: name. OPTIONS: name, length, dir_first, mtime, size.
@@ -62,7 +68,7 @@ pub fn main(init: std.process.Init.Minimal) !void {
     );
 
     if (res.args.help != 0) {
-        // show hellp msg
+        // show help msg
         std.debug.print("{s}\n", .{params_desc});
         return;
     }
