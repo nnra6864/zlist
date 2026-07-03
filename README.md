@@ -214,15 +214,17 @@ zl -lg
 <a id="benchmark"></a>
 ## Benchmark
 
-Quick check on a directory with 50K files, using plain output only: no icons, no colors, output redirected to `/dev/null`. (I used `hyperfine` for benchmarking)
+Benchmarked with `hyperfine` on macOS with an Apple M4 CPU.
 
-| Tool | Command | Mean time |
-| :--- | :--- | :--- |
-| `zl` | `zl -p /path > /dev/null` | `41.8 ms ± 0.6 ms` |
-| `eza` | `eza /path > /dev/null` | `180.3 ms ± 2.0 ms` |
-| macOS `/bin/ls` | `/bin/ls /path > /dev/null` | `169.3 ms ± 6.0 ms` |
+With icons and colors:
 
-In this run, `zl` came out about 4x faster than both `eza` and the system `ls`.
+| Tool | n=50 | n=500 | n=5000 | n=50000 |
+| :--- | :--- | :--- | :--- | :--- |
+| `zl` | `696.4 µs ±  59.4 µs` | `957.2 µs ±  62.2 µs` | `4.4 ms ±   0.1 ms` | `45.9 ms ±   2.1 ms` |
+| `eza` | `3.0 ms ±   0.2 ms` | `2.8 ms ±   0.2 ms` | `2.9 ms ±   0.1 ms` | `3.1 ms ±   0.2 ms` |
+| `lsd` | `2.9 ms ±   0.1 ms` | `10.7 ms ±   0.6 ms` | `97.8 ms ±   2.1 ms` | `1.227 s ±  0.055 s` |
+
+`eza` is the weirdly steady one here: its wall time barely moves whether the directory has 50 files or 50K. Its system CPU time also stays under 2 ms even at 50K entries. `zl` is already quick at smaller sizes, but this is exactly the kind of scaling behavior it should learn from next.
 
 *Benchmark results may vary depending on filesystem and hardware.*
 
