@@ -205,36 +205,17 @@ pub fn listDetail(files: zlist.Files, term: Terminal, comptime mode_opt: ModeOpt
         if (show_git) {
             const git_char = getGitStatusChar(files, val.name) orelse ' ';
             const git_color = getGitStatusColor(files, val.name);
-
             try term.setColor(git_color);
-            const icon = getIcon(val.is_dir, val.name);
-            try term.writer.print(comptime PrintMode.DetailWithGit.toString(), .{
-                git_char,
-                val.getPermissions(&perm_buf),
-                val.username,
-                val.groupname,
-                try val.humanSize(&size_buf),
-                try val.formatTime(&time_buf),
-                icon,
-                try val.formatLongDisplayName(&display_name_buf),
-            });
-        } else {
-            const common_args = .{
-                if (view_opt.show_permissions) val.getPermissions(&perm_buf) else "",
-                if (view_opt.show_user) val.username else "",
-                if (view_opt.show_group) val.groupname else "",
-                if (view_opt.show_size) try val.humanSize(&size_buf) else "",
-                if (view_opt.show_time) try val.formatTime(&time_buf) else "",
-            };
-            const display_name = try val.formatLongDisplayName(&display_name_buf);
-
-            if (mode_opt.pure) {
-                try term.writer.print(comptime PrintMode.DetailPure.toString(), common_args ++ .{display_name});
-            } else {
-                const icon = if (view_opt.show_icon) getIcon(val.is_dir, val.name) else "";
-                try term.writer.print(comptime PrintMode.Detail.toString(), common_args ++ .{ icon, display_name });
-            }
+            try term.writer.print("{c} ", .{git_char});
         }
+
+        if (view_opt.show_permissions) try term.writer.print("{s:<11} ", .{val.getPermissions(&perm_buf)});
+        if (view_opt.show_user) try term.writer.print("{s:<8} ", .{val.username});
+        if (view_opt.show_group) try term.writer.print("{s:<8} ", .{val.groupname});
+        if (view_opt.show_size) try term.writer.print("{s:<8} ", .{try val.humanSize(&size_buf)});
+        if (view_opt.show_time) try term.writer.print("{s:<8} ", .{try val.formatTime(&time_buf)});
+        if (view_opt.show_icon and !mode_opt.pure) try term.writer.print("{s} ", .{try val.formatTime(&time_buf)});
+        try term.writer.print("{s}", .{try val.formatLongDisplayName(&display_name_buf)});
 
         if (!mode_opt.pure) {
             try term.setColor(Terminal.Color.reset);
