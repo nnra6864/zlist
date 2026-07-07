@@ -15,6 +15,15 @@ const ModeOptionsComptime = struct {
     }
 };
 
+pub const LongViewOptions = struct {
+    show_permissions: bool = true,
+    show_user: bool = true,
+    show_group: bool = true,
+    show_size: bool = true,
+    show_time: bool = true,
+    show_icon: bool = true,
+};
+
 const PrintMode = enum {
     Detail,
     DetailPure,
@@ -180,7 +189,7 @@ pub fn list(
 }
 
 /// list files in detail mode
-pub fn listDetail(files: zlist.Files, term: Terminal, comptime mode_opt: ModeOptionsComptime) !void {
+pub fn listDetail(files: zlist.Files, term: Terminal, comptime mode_opt: ModeOptionsComptime, view_opt: LongViewOptions) !void {
     var perm_buf: [10]u8 = undefined;
     var size_buf: [32]u8 = undefined;
     var time_buf: [32]u8 = undefined;
@@ -211,18 +220,18 @@ pub fn listDetail(files: zlist.Files, term: Terminal, comptime mode_opt: ModeOpt
             });
         } else {
             const common_args = .{
-                val.getPermissions(&perm_buf),
-                val.username,
-                val.groupname,
-                try val.humanSize(&size_buf),
-                try val.formatTime(&time_buf),
+                if (view_opt.show_permissions) val.getPermissions(&perm_buf) else "",
+                if (view_opt.show_user) val.username else "",
+                if (view_opt.show_group) val.groupname else "",
+                if (view_opt.show_size) try val.humanSize(&size_buf) else "",
+                if (view_opt.show_time) try val.formatTime(&time_buf) else "",
             };
             const display_name = try val.formatLongDisplayName(&display_name_buf);
 
             if (mode_opt.pure) {
                 try term.writer.print(comptime PrintMode.DetailPure.toString(), common_args ++ .{display_name});
             } else {
-                const icon = getIcon(val.is_dir, val.name);
+                const icon = if (view_opt.show_icon) getIcon(val.is_dir, val.name) else "";
                 try term.writer.print(comptime PrintMode.Detail.toString(), common_args ++ .{ icon, display_name });
             }
         }
