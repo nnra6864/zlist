@@ -13,10 +13,11 @@ const params_desc: []const u8 = blk: {
     \\-h, --help                 Usage: zl [OPTIONS] [PATH]...
     \\-l, --long                 Show the long view.
     \\    --no-permissions       Hide permissions from the long view.
-    \\    --no-size              Hide size from the long view.
     \\    --no-user              Hide user from the long view.
     \\    --no-group             Hide group from the long view.
+    \\    --no-size              Hide size from the long view.
     \\    --no-time              Hide time from the long view.
+    \\    --no-icon              Hide icon from the long view.
     \\-a, --a                    Include hidden entries.
     \\    --du                   Show recursive directory size in long view and size sort. This is the sum of file sizes, not the same as `du` disk usage.
     \\-s, --sort <SORTTYPE>      Sort results. Default: name. OPTIONS: name, length, dir_first, mtime, size.
@@ -89,11 +90,20 @@ pub fn main(init: std.process.Init.Minimal) !void {
         else => return err,
     };
 
+    const long_view_opt = render.LongViewOptions{
+        .show_permissions = res.args.@"no-permissions" == 0,
+        .show_user = res.args.@"no-user" == 0,
+        .show_group = res.args.@"no-group" == 0,
+        .show_size = res.args.@"no-size" == 0,
+        .show_time = res.args.@"no-time" == 0,
+        .show_icon = res.args.@"no-icon" == 0,
+    };
+
     for (cli.paths, 0..) |path, index| {
         var opt = cli.opt;
         opt.path = path;
 
-        runForPath(allocator, io, opt, path, cli.pure, cli.paths.len > 1, index) catch |err| switch (err) {
+        runForPath(allocator, io, opt, long_view_opt, path, cli.pure, cli.paths.len > 1, index) catch |err| switch (err) {
             error.FileNotFound => std.debug.print("zl: path not found: {s}\n", .{path}),
             error.NotDir => std.debug.print("zl: not a directory: {s}\n", .{path}),
             else => return err,
@@ -105,6 +115,7 @@ inline fn runForPath(
     allocator: std.mem.Allocator,
     io: std.Io,
     opt: zlist.FilesOptions,
+    long_view_opt: render.LongViewOptions,
     path: []const u8,
     pure: bool,
     show_header: bool,
@@ -126,7 +137,7 @@ inline fn runForPath(
 
     const cwd = std.Io.Dir.cwd();
     const dir = cwd.openDir(io, path, .{ .iterate = true }) catch |err| switch (err) {
-        error.NotDir => return runForSingleFile(allocator, io, stdout_file, opt, pure, path),
+        error.NotDir => return runForSingleFile(allocator, io, stdout_file, opt, long_view_opt, pure, path),
         error.FileNotFound => {
             std.debug.print("zl: path not found: {s}\n", .{path});
             return;
@@ -135,7 +146,7 @@ inline fn runForPath(
     };
     defer dir.close(io);
 
-    return runForDirectory(allocator, io, stdout_file, opt, pure, dir);
+    return runForDirectory(allocator, io, stdout_file, opt, long_view_opt, pure, dir);
 }
 
 inline fn runForDirectory(
@@ -143,13 +154,14 @@ inline fn runForDirectory(
     io: std.Io,
     stdout_file: std.Io.File,
     opt: zlist.FilesOptions,
+    long_view_opt: render.LongViewOptions,
     pure: bool,
     dir: std.Io.Dir,
 ) !void {
     var files = try zlist.Files.init(allocator, io, dir, opt);
     defer files.deinit();
 
-    try printFiles(io, stdout_file, opt, pure, &files, dir);
+    try printFiles(io, stdout_file, opt, long_view_opt, pure, &files, dir);
 }
 
 inline fn runForSingleFile(
@@ -157,19 +169,21 @@ inline fn runForSingleFile(
     io: std.Io,
     stdout_file: std.Io.File,
     opt: zlist.FilesOptions,
+    long_view_opt: render.LongViewOptions,
     pure: bool,
     path: []const u8,
 ) !void {
     var files = try zlist.Files.initSingle(allocator, io, path, opt);
     defer files.deinit();
 
-    try printFiles(io, stdout_file, opt, pure, &files, null);
+    try printFiles(io, stdout_file, opt, long_view_opt, pure, &files, null);
 }
 
 fn printFiles(
     io: std.Io,
     stdout_file: std.Io.File,
     opt: zlist.FilesOptions,
+    long_view_opt: render.LongViewOptions,
     pure: bool,
     files: *zlist.Files,
     dir: ?std.Io.Dir,
@@ -185,8 +199,8 @@ fn printFiles(
     if (opt.show_detail) {
         // long format
         switch (pure) {
-            true => try render.listDetail(files.*, term, .{ .pure = true }),
-            false => try render.listDetail(files.*, term, .{ .pure = false }),
+            true => try render.listDetail(files.*, term, .{ .pure = true }, long_view_opt),
+            false => try render.listDetail(files.*, term, .{ .pure = false }, long_view_opt),
         }
     } else if (opt.recursive) {
         // recursive
