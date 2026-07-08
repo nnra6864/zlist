@@ -15,8 +15,8 @@ I built this project to learn Zig, get comfortable with manual memory management
 - [Features](#features)
 - [Preview](#preview)
 - [Installation](#installation)
-- [Use as a Zig Module](#module)
 - [Usage](#usage)
+- [Use as a Zig Module](#module)
 - [Benchmark](#benchmark)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -80,6 +80,88 @@ zig build -Doptimize=ReleaseFast
 ./zig-out/bin/zl
 ```
 
+<a id="usage"></a>
+## 🛠 Usage
+
+Just run:
+
+```bash
+zl [OPTIONS] [PATH]
+```
+
+```bash
+$ zl --help
+    -h, --help
+            Usage: zl [OPTIONS] [PATH]...
+
+    -l, --long
+            Show the long view.
+
+        --no-permissions
+            Hide permissions from the long view.
+
+        --no-user
+            Hide user from the long view.
+
+        --no-group
+            Hide group from the long view.
+
+        --no-size
+            Hide size from the long view.
+
+        --no-time
+            Hide time from the long view.
+
+        --no-icon
+            Hide icon from the long view.
+
+    -a, --a
+            Include hidden entries.
+
+        --du
+            Show recursive directory size in long view and size sort. This is the sum of file sizes, not the same as `du` disk usage.
+
+    -s, --sort <SORTTYPE>
+            Sort results. Default: name. OPTIONS: name, length, dir_first, mtime, size.
+
+        --size <str>...
+            Filter files by size range (e.g. --size gt:10K --size lte:2M).
+
+        --changed-within <str>
+            Only show entries changed within a time range (e.g. --changed-within 7d).
+
+    -r, --recursive
+            Recurse into subdirectories. Same as -L 0.
+
+    -L, --level <INT>
+            Limit recursion depth. 0 means no limit.
+
+    -p, --pure
+            Show names only, without colors or icons.
+
+    -R, --report
+            Show a short summary of files and folders.
+
+    -d, --dir
+            Only show directories. If used with -D, both are ignored.
+
+    -D, --no_dir
+            Only show files. If used with -d, both are ignored.
+
+    -g, --git
+            Show git status in long view.
+
+    -e, --ext <str>...
+            Filter by extension (e.g. --ext zig,md,ts).
+
+    -m, --match <str>...
+            Filter names by substring (e.g. --match main,readme).
+
+    <str>...
+```
+
+For common commands examples, see [zlist examples](docs/examples.md).
+
 <a id="module"></a>
 ## Use as a Zig Module
 
@@ -119,107 +201,6 @@ fn printNames(allocator: std.mem.Allocator, io: std.Io, dir: std.Io.Dir) !void {
 ```
 
 For options, ownership rules, and more examples, see [Using zlist as a module](docs/using-as-a-module.md).
-
-<a id="usage"></a>
-## 🛠 Usage
-
-Just run:
-
-```bash
-zl [OPTIONS] [PATH]
-```
-
-| Flag | Description |
-| :--- | :--- |
-| `-l`, `--long` | Show detailed view (permissions, size, date, user). |
-| `-a`, `--a` | Show hidden files (starting with `.`). |
-| `--du` | Show recursive directory size in long view and size sorting. This is the sum of file sizes, so it may differ from `du` disk usage. |
-| `-s`, `--sort <mode>` | `name` (A-Z) [Default]<br>`length` (Shortest first)<br>`dir_first` (Dirs first)<br>`mtime` (Newest first)<br>`size` (Largest first) |
-| `-r`, `--recursive` | Recurse into subdirectories. |
-| `-L`, `--level <INT>` | Limit the depth of recursion (use `0` for infinite depth). |
-| `-p`, `--pure` | Clean output without colors or icons (useful for pipes). |
-| `-d`, `--dir` | Only show directories. |
-| `-D`, `--no_dir` | Only show files (hide directories). |
-| `-e`, `--ext <str>...` | Hide files by extension, e.g. `--ext zig,go,ts`. |
-| `-m`, `--match <str>...` | Only show names that contain the given text, e.g. `--match test`. |
-| `--size <str>...` | Only show files in a size range, e.g. `--size gt:10K --size lte:2M`. Supports `gt`, `gte`, `lt`, `lte`, `eq` and units `B`, `K`, `M`, `G`, `T`. |
-| `--changed-within <str>` | Only show entries changed within a time range, e.g. `--changed-within 7d`. Supports `s`, `m`, `h`, `d`, `w`. |
-| `-R`, `--report` | Show a brief summary of file and folder counts. |
-| `-g`, `--git` | Show Git status indicators (requires `-l` to work). |
-| `-h`, `--help` | Print help message. |
-
-### Examples
-
-**Standard list:**
-```bash
-zl
-```
-
-**Show all files with details (sorted by filename length):**
-```bash
-zl -la -s length
-```
-
-**Show recursive directory sizes in long view:**
-```bash
-zl -l --du
-```
-
-**Sort by recursive directory size:**
-```bash
-zl --du -s size -l
-```
-
-**Dig deep (recursive listing):**
-```bash
-# Basic recursive (infinite)
-zl -r
-
-# Limit recursion to 2 levels deep
-zl -L 2
-```
-
-**Clean output (no colors/icons):**
-```bash
-zl -p
-```
-
-**Filter by file type (directories only / files only):**
-```bash
-zl -d
-zl -D
-```
-
-**Exclude some extensions:**
-```bash
-zl --ext zig,go,ts
-```
-
-**Match by name:**
-```bash
-zl --match test
-```
-
-**Filter files by size:**
-```bash
-zl --size lt:10K
-zl --size gt:10K --size lte:2M
-```
-
-**Show files changed recently:**
-```bash
-zl --changed-within 7d
-```
-
-**Show summary report:**
-```bash
-zl -R
-```
-
-**Show Git status (must be used with `-l`):**
-```bash
-zl -lg
-```
 
 <a id="benchmark"></a>
 ## Benchmark
