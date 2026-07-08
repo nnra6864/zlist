@@ -10,28 +10,29 @@ var threaded: std.Io.Threaded = undefined;
 
 const params_desc: []const u8 = blk: {
     break :blk
-    \\-h, --help                 Usage: zl [OPTIONS] [PATH]...
-    \\-l, --long                 Show the long view.
-    \\    --no-permissions       Hide permissions from the long view.
-    \\    --no-user              Hide user from the long view.
-    \\    --no-group             Hide group from the long view.
-    \\    --no-size              Hide size from the long view.
-    \\    --no-time              Hide time from the long view.
-    \\    --no-icon              Hide icon from the long view.
-    \\-a, --a                    Include hidden entries.
-    \\    --du                   Show recursive directory size in long view and size sort. This is the sum of file sizes, not the same as `du` disk usage.
-    \\-s, --sort <SORTTYPE>      Sort results. Default: name. OPTIONS: name, length, dir_first, mtime, size.
-    \\    --size <str>...        Filter files by size range (e.g. --size gt:10K --size lte:2M).
-    \\    --changed-within <str> Only show entries changed within a time range (e.g. --changed-within 7d).
-    \\-r, --recursive            Recurse into subdirectories. Same as -L 0.
-    \\-L, --level <INT>          Limit recursion depth. 0 means no limit.
-    \\-p, --pure                 Show names only, without colors or icons.
-    \\-R, --report               Show a short summary of files and folders.
-    \\-d, --dir                  Only show directories. If used with -D, both are ignored.
-    \\-D, --no_dir               Only show files. If used with -d, both are ignored.
-    \\-g, --git                  Show git status in long view.
-    \\-e, --ext <str>...         Filter by extension (e.g. --ext zig,md,ts).
-    \\-m, --match <str>...       Filter names by substring (e.g. --match main,readme).
+    \\-h, --help                       Usage: zl [OPTIONS] [PATH]...
+    \\-l, --long                       Show the long view.
+    \\    --no-permissions             Hide permissions from the long view.
+    \\    --no-user                    Hide user from the long view.
+    \\    --no-group                   Hide group from the long view.
+    \\    --no-size                    Hide size from the long view.
+    \\    --no-time                    Hide time from the long view.
+    \\    --no-icon                    Hide icon from the long view.
+    \\-a, --a                          Include hidden entries.
+    \\    --du                         Show recursive directory size in long view and size sort. This is the sum of file sizes, not the same as `du` disk usage.
+    \\    --dir-grouping <DIRGROUPING> Group directories before or after files. Default: none. OPTIONS: none, before, after.
+    \\-s, --sort <SORTTYPE>            Sort results. Default: name. OPTIONS: name, length, dir_first, mtime, size.
+    \\    --size <str>...              Filter files by size range (e.g. --size gt:10K --size lte:2M).
+    \\    --changed-within <str>       Only show entries changed within a time range (e.g. --changed-within 7d).
+    \\-r, --recursive                  Recurse into subdirectories. Same as -L 0.
+    \\-L, --level <INT>                Limit recursion depth. 0 means no limit.
+    \\-p, --pure                       Show names only, without colors or icons.
+    \\-R, --report                     Show a short summary of files and folders.
+    \\-d, --dir                        Only show directories. If used with -D, both are ignored.
+    \\-D, --no_dir                     Only show files. If used with -d, both are ignored.
+    \\-g, --git                        Show git status in long view.
+    \\-e, --ext <str>...               Filter by extension (e.g. --ext zig,md,ts).
+    \\-m, --match <str>...             Filter names by substring (e.g. --match main,readme).
     \\<str>...
     \\
     ;
@@ -52,6 +53,7 @@ pub fn main(init: std.process.Init.Minimal) !void {
     // parsers
     const parsers = comptime .{
         .str = clap.parsers.string,
+        .DIRGROUPING = clap.parsers.enumeration(zlist.DirGrouping),
         .SORTTYPE = clap.parsers.enumeration(zlist.SortType),
         .INT = clap.parsers.int(i8, 10),
     };

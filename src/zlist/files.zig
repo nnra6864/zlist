@@ -3,8 +3,8 @@ const mem = std.mem;
 const testing = std.testing;
 
 const file = @import("file.zig");
-const opts = @import("opts.zig");
 const git = @import("git.zig");
+const opts = @import("opts.zig");
 
 pub const Files = struct {
     const Self = @This();
@@ -137,7 +137,7 @@ pub const Files = struct {
             loaded_git = true;
         }
 
-        sort(files.items, opt.sort_type);
+        sort(files.items, opt.dir_grouping, opt.sort_type);
 
         return .{
             .max_display_len = max_len,
@@ -363,29 +363,36 @@ pub const Files = struct {
         self.total_files += child.total_files;
     }
 
-    fn sort(items: []file.File, sort_type: opts.SortType) void {
-        switch (sort_type) {
-            .length => {
-                // sort by name length
-                mem.sortUnstable(file.File, items, {}, file.File.nameLenLessThan);
-            },
-            .dir_first => {
-                // sort by directory first
-                mem.sortUnstable(file.File, items, {}, file.File.dirMoreThan);
-            },
-            .mtime => {
-                // sort by modification time desc
-                mem.sortUnstable(file.File, items, {}, file.File.mtimeMoreThan);
-            },
-            .size => {
-                // sort by file size desc
-                mem.sortUnstable(file.File, items, {}, file.File.sizeMoreThan);
-            },
-            else => {
-                // sort by name ascending
-                mem.sortUnstable(file.File, items, {}, file.File.nameLessThan);
-            },
+    const SortCtx = struct {
+        sort_type: opts.SortType,
+        dir_grouping: opts.DirGrouping,
+
+        fn lessThan(ctx: SortCtx, a: file.File, b: file.File) bool {
+            if (ctx.dir_grouping != .none) {
+                const a_dir = a.is_dir;
+                const b_dir = b.is_dir;
+                if (a_dir != b_dir) return a_dir == (ctx.dir_grouping == .before);
+            }
+
+            return switch (ctx.sort_type) {
+                .length => file.File.nameLenLessThan({}, a, b),
+                .mtime => file.File.mtimeMoreThan({}, a, b),
+                .size => file.File.sizeMoreThan({}, a, b),
+                else => file.File.nameLessThan({}, a, b),
+            };
         }
+    };
+
+    fn sort(items: []file.File, dir_grouping: opts.DirGrouping, sort_type: opts.SortType) void {
+        mem.sortUnstable(
+            file.File,
+            items,
+            SortCtx{
+                .dir_grouping = dir_grouping,
+                .sort_type = sort_type,
+            },
+            SortCtx.lessThan,
+        );
     }
 
     /// recursively calculate directory size by summing up sizes of all descendant files.

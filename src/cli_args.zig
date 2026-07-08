@@ -43,6 +43,10 @@ pub inline fn parseCliConfig(allocator: std.mem.Allocator, res: anytype) !CliCon
         opt.recursive_dir_size = true;
     }
 
+    if (res.args.@"dir-grouping") |dir_grouping| {
+        opt.dir_grouping = dir_grouping;
+    }
+
     if (res.args.sort) |sort| {
         opt.sort_type = sort;
     }
