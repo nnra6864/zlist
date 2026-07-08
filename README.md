@@ -121,11 +121,8 @@ $ zl --help
         --du
             Show recursive directory size in long view and size sort. This is the sum of file sizes, not the same as `du` disk usage.
 
-        --dir-first
-            List directories before files
-
-        --dir-last
-            List directories after files
+        --dir-grouping <DIRGROUPING>
+            Group directories before or after files. Default: none. OPTIONS: none, before, after.
 
     -s, --sort <SORTTYPE>
             Sort results. Default: name. OPTIONS: name, length, dir_first, mtime, size.
