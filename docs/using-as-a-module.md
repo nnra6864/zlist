@@ -106,6 +106,7 @@ Available types:
 - `zlist.Files`
 - `zlist.FilesOptions`
 - `zlist.FileOptions`
+- `zlist.DirGrouping`
 - `zlist.SortType`
 - `zlist.SizeRange`
 - `zlist.GitStatus`
