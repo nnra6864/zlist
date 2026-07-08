@@ -20,15 +20,15 @@ const params_desc: []const u8 = blk: {
     \\    --no-icon                    Hide icon from the long view.
     \\-a, --a                          Include hidden entries.
     \\    --du                         Show recursive directory size in long view and size sort. This is the sum of file sizes, not the same as `du` disk usage.
-    \\    --dir-grouping <DIRGROUPING> Group directories before or after files. Default: none. OPTIONS: none, before, after.
+    \\-G, --dir-grouping <DIRGROUPING> Group directories before or after files. Default: none. OPTIONS: none, before, after.
     \\-s, --sort <SORTTYPE>            Sort results. Default: name. OPTIONS: name, length, dir_first, mtime, size.
-    \\    --reverse                    Reverse sort
+    \\-R, --reverse                    Reverse sort
     \\    --size <str>...              Filter files by size range (e.g. --size gt:10K --size lte:2M).
     \\    --changed-within <str>       Only show entries changed within a time range (e.g. --changed-within 7d).
     \\-r, --recursive                  Recurse into subdirectories. Same as -L 0.
     \\-L, --level <INT>                Limit recursion depth. 0 means no limit.
     \\-p, --pure                       Show names only, without colors or icons.
-    \\-R, --report                     Show a short summary of files and folders.
+    \\    --report                     Show a short summary of files and folders.
     \\-d, --dir                        Only show directories. If used with -D, both are ignored.
     \\-D, --no_dir                     Only show files. If used with -d, both are ignored.
     \\-g, --git                        Show git status in long view.
