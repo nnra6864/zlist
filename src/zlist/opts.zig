@@ -1,12 +1,19 @@
 const std = @import("std");
 
+pub const DirGrouping = enum {
+    /// no grouping
+    none,
+    /// group before files
+    before,
+    /// group after files
+    after,
+};
+
 pub const SortType = enum {
     /// sort by name(asc)
     name,
     /// sort by name length(asc). Default
     length,
-    /// sort by group directories first
-    dir_first,
     /// sort by modification time(desc)
     mtime,
     /// sort by file size(desc)
@@ -27,6 +34,8 @@ pub const FilesOptions = struct {
     show_hidden: bool = false,
     /// report mode, shows brief report about number of files and folders shown
     report: bool = false,
+    /// dir grouping
+    dir_grouping: DirGrouping = .none,
     /// sort type
     sort_type: SortType = .name,
     /// only show directories, not files

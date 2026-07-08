@@ -12,6 +12,7 @@ pub const Files = @import("zlist/files.zig").Files;
 pub const FilesOptions = opts.FilesOptions;
 pub const FileOptions = opts.FileOptions;
 
+pub const DirGrouping = opts.DirGrouping;
 pub const SortType = opts.SortType;
 pub const SizeRange = opts.SizeRange;
 pub const GitStatus = @import("zlist/git.zig").GitStatus;

@@ -63,6 +63,7 @@ Useful options:
 | :--- | :--- |
 | `show_hidden` | Include names starting with `.`. |
 | `show_detail` | Load extra metadata such as size, permissions, owner, and symlink target. |
+| `dir_grouping` | Group directories `.none`, `.before`, `.after` |
 | `sort_type` | Sort by `.name`, `.length`, `.dir_first`, `.mtime`, or `.size`. |
 | `only_dir` | Keep only directories. |
 | `only_file` | Keep only files. |
