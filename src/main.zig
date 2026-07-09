@@ -21,7 +21,7 @@ const params_desc: []const u8 = blk: {
     \\-a, --a                          Include hidden entries.
     \\    --du                         Show recursive directory size in long view and size sort. This is the sum of file sizes, not the same as `du` disk usage.
     \\-G, --dir-grouping <DIRGROUPING> Group directories before or after files. Default: none. OPTIONS: none, before, after.
-    \\-s, --sort <SORTTYPE>            Sort results. Default: name. OPTIONS: name, length, dir_first, mtime, size.
+    \\-s, --sort <SORTTYPE>            Sort results. Default: name. OPTIONS: name, length, mtime, size.
     \\-R, --reverse                    Reverse sort
     \\    --size <str>...              Filter files by size range (e.g. --size gt:10K --size lte:2M).
     \\    --changed-within <str>       Only show entries changed within a time range (e.g. --changed-within 7d).

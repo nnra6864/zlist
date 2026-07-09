@@ -125,7 +125,7 @@ $ zl --help
             Group directories before or after files. Default: none. OPTIONS: none, before, after.
 
     -s, --sort <SORTTYPE>
-            Sort results. Default: name. OPTIONS: name, length, dir_first, mtime, size.
+            Sort results. Default: name. OPTIONS: name, length, mtime, size.
 
         --reverse
             Reverse sort.
