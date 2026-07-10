@@ -27,6 +27,7 @@ const params_desc: []const u8 = blk: {
     \\    --changed-within <str>       Only show entries changed within a time range (e.g. --changed-within 7d).
     \\-r, --recursive                  Recurse into subdirectories. Same as -L 0.
     \\-L, --level <INT>                Limit recursion depth. 0 means no limit.
+    \\    --root-display <ROOTDISPLAY> Changes how root dir is displayed in recursive view. Default: dot. OPTIONS: dot, name, none.
     \\-p, --pure                       Show names only, without colors or icons.
     \\    --report                     Show a short summary of files and folders.
     \\-d, --dir                        Only show directories. If used with -D, both are ignored.
@@ -57,6 +58,7 @@ pub fn main(init: std.process.Init.Minimal) !void {
         .DIRGROUPING = clap.parsers.enumeration(zlist.DirGrouping),
         .SORTTYPE = clap.parsers.enumeration(zlist.SortType),
         .INT = clap.parsers.int(i8, 10),
+        .ROOTDISPLAY = clap.parsers.enumeration(render.RootDisplay),
     };
 
     // parse command line arguments
@@ -103,7 +105,7 @@ pub fn main(init: std.process.Init.Minimal) !void {
         opt.path = path;
 
         // Reuse parsed rendering options for every requested path.
-        runForPath(allocator, io, opt, cli.long_view_opt, path, cli.pure, cli.paths.len > 1, index) catch |err| switch (err) {
+        runForPath(allocator, io, opt, cli.long_view_opt, cli.root_display, path, cli.pure, cli.paths.len > 1, index) catch |err| switch (err) {
             error.FileNotFound => std.debug.print("zl: path not found: {s}\n", .{path}),
             error.NotDir => std.debug.print("zl: not a directory: {s}\n", .{path}),
             else => return err,
@@ -116,6 +118,7 @@ inline fn runForPath(
     io: std.Io,
     opt: zlist.FilesOptions,
     long_view_opt: render.LongViewOptions,
+    root_display: render.RootDisplay,
     path: []const u8,
     pure: bool,
     show_header: bool,
@@ -137,7 +140,7 @@ inline fn runForPath(
 
     const cwd = std.Io.Dir.cwd();
     const dir = cwd.openDir(io, path, .{ .iterate = true }) catch |err| switch (err) {
-        error.NotDir => return runForSingleFile(allocator, io, stdout_file, opt, long_view_opt, pure, path),
+        error.NotDir => return runForSingleFile(allocator, io, stdout_file, opt, long_view_opt, root_display, pure, path),
         error.FileNotFound => {
             std.debug.print("zl: path not found: {s}\n", .{path});
             return;
@@ -146,7 +149,7 @@ inline fn runForPath(
     };
     defer dir.close(io);
 
-    return runForDirectory(allocator, io, stdout_file, opt, long_view_opt, pure, dir);
+    return runForDirectory(allocator, io, stdout_file, opt, long_view_opt, root_display, pure, dir);
 }
 
 inline fn runForDirectory(
@@ -155,13 +158,14 @@ inline fn runForDirectory(
     stdout_file: std.Io.File,
     opt: zlist.FilesOptions,
     long_view_opt: render.LongViewOptions,
+    root_display: render.RootDisplay,
     pure: bool,
     dir: std.Io.Dir,
 ) !void {
     var files = try zlist.Files.init(allocator, io, dir, opt);
     defer files.deinit();
 
-    try printFiles(io, stdout_file, opt, long_view_opt, pure, &files, dir);
+    try printFiles(io, stdout_file, opt, long_view_opt, root_display, pure, &files, dir);
 }
 
 inline fn runForSingleFile(
@@ -170,13 +174,14 @@ inline fn runForSingleFile(
     stdout_file: std.Io.File,
     opt: zlist.FilesOptions,
     long_view_opt: render.LongViewOptions,
+    root_display: render.RootDisplay,
     pure: bool,
     path: []const u8,
 ) !void {
     var files = try zlist.Files.initSingle(allocator, io, path, opt);
     defer files.deinit();
 
-    try printFiles(io, stdout_file, opt, long_view_opt, pure, &files, null);
+    try printFiles(io, stdout_file, opt, long_view_opt, root_display, pure, &files, null);
 }
 
 fn printFiles(
@@ -184,6 +189,7 @@ fn printFiles(
     stdout_file: std.Io.File,
     opt: zlist.FilesOptions,
     long_view_opt: render.LongViewOptions,
+    root_display: render.RootDisplay,
     pure: bool,
     files: *zlist.Files,
     dir: ?std.Io.Dir,
@@ -206,8 +212,8 @@ fn printFiles(
         // recursive
         if (dir) |opened_dir| {
             switch (pure) {
-                true => try render.listRecursive(files, term, "", true, opened_dir, .{ .pure = true }),
-                false => try render.listRecursive(files, term, "", true, opened_dir, .{ .pure = false }),
+                true => try render.listRecursive(files, term, "", true, opened_dir, .{ .pure = true }, root_display),
+                false => try render.listRecursive(files, term, "", true, opened_dir, .{ .pure = false }, root_display),
             }
         } else {
             switch (pure) {

@@ -142,6 +142,9 @@ $ zl --help
     -L, --level <INT>
             Limit recursion depth. 0 means no limit.
 
+        --root-display <ROOTDISPLAY>
+            Changes how root dir is displayed in recursive view. Default: dot. OPTIONS: dot, name, none.
+
     -p, --pure
             Show names only, without colors or icons.
 
