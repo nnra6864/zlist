@@ -244,7 +244,11 @@ pub fn listRecursive(
     root_display: RootDisplay,
 ) !void {
     if (first) {
-        if (root_display == .dot) try term.writer.print(".\n", .{});
+        switch (root_display) {
+            .dot => try term.writer.print(".\n", .{}),
+            .name => try term.writer.print("{s}\n", .{files.entries()[0].name}),
+            .none => {},
+        }
     }
 
     if (files.recursionLimitReached()) {
