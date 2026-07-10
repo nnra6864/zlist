@@ -260,7 +260,7 @@ pub fn listRecursive(
 
     for (entries, 0..) |val, i| {
         const is_last = (i == total - 1);
-        const connector = if (root_display == .none and first) "" else if (is_last) "└──" else "├──";
+        const connector = if (first and root_display == .none) "" else if (is_last) "└──" else "├──";
 
         // print prefix and connector
         if (!mode_opt.pure) {
