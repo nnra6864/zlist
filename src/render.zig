@@ -24,6 +24,15 @@ pub const LongViewOptions = struct {
     show_icon: bool = true,
 };
 
+pub const RootDisplay = enum {
+    /// displays a dot
+    dot,
+    /// displays the root dir name
+    name,
+    /// root dir is not displayed and first level is not indented
+    none,
+};
+
 const PrintMode = enum {
     Detail,
     DetailPure,
@@ -232,9 +241,10 @@ pub fn listRecursive(
     first: bool,
     dir: std.Io.Dir,
     comptime mode_opt: ModeOptionsComptime,
+    root_display: RootDisplay,
 ) !void {
     if (first) {
-        try term.writer.print(".\n", .{});
+        if (root_display == .dot) try term.writer.print(".\n", .{});
     }
 
     if (files.recursionLimitReached()) {
@@ -307,7 +317,7 @@ pub fn listRecursive(
             try prefix_builder.appendSlice(files.allocator, prefix);
             try prefix_builder.appendSlice(files.allocator, child_connector);
 
-            try listRecursive(&sub_files, term, prefix_builder.items, false, sub_dir, mode_opt);
+            try listRecursive(&sub_files, term, prefix_builder.items, false, sub_dir, mode_opt, root_display);
 
             // accumulate counts from subdirectories
             files.addReportTotals(sub_files);
@@ -467,6 +477,6 @@ test "recursive" {
 
     const term = try getTerminal(io, &stdout_writer.interface, stdout_file);
 
-    try listRecursive(&files, term, "", true, tmp_dir.dir, .{ .pure = false });
+    try listRecursive(&files, term, "", true, tmp_dir.dir, .{ .pure = false }, .dot);
     try stdout_writer.interface.flush();
 }

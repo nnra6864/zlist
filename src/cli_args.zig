@@ -8,6 +8,8 @@ pub const CliConfig = struct {
     opt: zlist.FilesOptions,
     /// Options used when rendering the long view.
     long_view_opt: render.LongViewOptions,
+    /// Root display options in recursive mode
+    root_display: render.RootDisplay,
     pure: bool,
     paths: []const []const u8,
 };
@@ -90,6 +92,8 @@ pub inline fn parseCliConfig(allocator: std.mem.Allocator, res: anytype) !CliCon
         opt.show_git = false;
     }
 
+    const root_display = res.args.@"root-display" orelse .dot;
+
     opt.exts = try parseCsvArgs(allocator, res.args.ext);
     opt.matches = try parseCsvArgs(allocator, res.args.match);
     opt.size_range = try parseSizeArgs(res.args.size);
@@ -106,6 +110,7 @@ pub inline fn parseCliConfig(allocator: std.mem.Allocator, res: anytype) !CliCon
     return .{
         .opt = opt,
         .long_view_opt = long_view_opt,
+        .root_display = root_display,
         .pure = pure,
         .paths = paths,
     };
