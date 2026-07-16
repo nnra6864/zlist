@@ -220,13 +220,13 @@ pub fn listDetail(files: zlist.Files, term: Terminal, comptime mode_opt: ModeOpt
     }
 
     if (show_header) {
+        if (show_git) try term.writer.print("Git ", .{});
         if (view_opt.show_permissions) try term.writer.print("Permissions ", .{});
         if (view_opt.show_user) try term.writer.print("{s:<[1]} ", .{ "User", user_len });
         if (view_opt.show_group) try term.writer.print("{s:<[1]} ", .{ "Group", group_len });
         if (view_opt.show_size) try term.writer.print("Size ", .{});
         if (view_opt.show_time) try term.writer.print("{s:<[1]} ", .{ "Time", time_len });
-        try term.writer.print("Name ", .{});
-        try term.writer.print("\n", .{});
+        try term.writer.print("Name\n", .{});
     }
 
     for (files.entries()) |val| {
@@ -238,7 +238,7 @@ pub fn listDetail(files: zlist.Files, term: Terminal, comptime mode_opt: ModeOpt
             const git_char = getGitStatusChar(files, val.name) orelse ' ';
             const git_color = getGitStatusColor(files, val.name);
             try term.setColor(git_color);
-            try term.writer.print("{c} ", .{git_char});
+            try term.writer.print("{c}   ", .{git_char});
         }
 
         if (view_opt.show_permissions) try term.writer.print("{s:<11} ", .{val.getPermissions(&perm_buf)});
