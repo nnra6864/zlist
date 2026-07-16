@@ -247,7 +247,7 @@ pub fn listDetail(files: zlist.Files, term: Terminal, comptime mode_opt: ModeOpt
         if (view_opt.show_group) try term.writer.print("{s:<[1]} ", .{ val.groupname, group_len });
         if (view_opt.show_size) try term.writer.print("{s:>4} ", .{try val.humanSize(&size_buf)});
         if (view_opt.show_time) try term.writer.print("{s:>[1]} ", .{ try val.formatTime(&time_buf), time_len });
-        if (view_opt.show_icon and !mode_opt.pure) try term.writer.print("{s} ", .{getIcon(val.is_dir, val.name)});
+        if (view_opt.show_icon and !mode_opt.pure) try term.writer.print("{s}", .{getIcon(val.is_dir, val.name)});
         try term.writer.print("{s}", .{try val.formatLongDisplayName(&display_name_buf)});
 
         if (!mode_opt.pure) {
