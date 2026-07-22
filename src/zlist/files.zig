@@ -137,7 +137,7 @@ pub const Files = struct {
             loaded_git = true;
         }
 
-        sort(files.items, opt.dir_grouping, opt.sort_type, opt.reverse);
+        sort(files.items, opt.dir_grouping, opt.sort_type, opt.reverse, io, dir);
 
         return .{
             .max_display_len = max_len,
@@ -367,12 +367,14 @@ pub const Files = struct {
         sort_type: opts.SortType,
         dir_grouping: opts.DirGrouping,
         reverse: bool,
+        io: std.Io,
+        dir: std.Io.Dir,
 
         fn lessThan(ctx: SortCtx, a: file.File, b: file.File) bool {
             if (ctx.dir_grouping != .none) {
-                const a_dir = a.is_dir;
-                const b_dir = b.is_dir;
-                if (a_dir != b_dir) return a_dir == (ctx.dir_grouping == .before);
+                const a_is_dir = if (a.symlink_target) |target| isDir(target, ctx.io, ctx.dir) else a.is_dir;
+                const b_is_dir = if (b.symlink_target) |target| isDir(target, ctx.io, ctx.dir) else b.is_dir;
+                if (a_is_dir != b_is_dir) return a_is_dir == (ctx.dir_grouping == .before);
             }
 
             const res = switch (ctx.sort_type) {
@@ -384,9 +386,14 @@ pub const Files = struct {
 
             return if (ctx.reverse) !res else res;
         }
+
+        fn isDir(path: []const u8, io: std.Io, dir: std.Io.Dir) bool {
+            const stat = dir.statFile(io, path, .{}) catch return false;
+            return stat.kind == .directory;
+        }
     };
 
-    fn sort(items: []file.File, dir_grouping: opts.DirGrouping, sort_type: opts.SortType, reverse: bool) void {
+    fn sort(items: []file.File, dir_grouping: opts.DirGrouping, sort_type: opts.SortType, reverse: bool, io: std.Io, dir: std.Io.Dir) void {
         mem.sortUnstable(
             file.File,
             items,
@@ -394,6 +401,8 @@ pub const Files = struct {
                 .dir_grouping = dir_grouping,
                 .sort_type = sort_type,
                 .reverse = reverse,
+                .io = io,
+                .dir = dir,
             },
             SortCtx.lessThan,
         );
