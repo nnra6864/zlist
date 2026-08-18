@@ -61,36 +61,36 @@ const PrintMode = enum {
 };
 
 const icon_inventory = std.StaticStringMap([]const u8).initComptime(.{
-    .{ ".zig", " " },
-    .{ ".zon", " " },
-    .{ ".go", " " },
-    .{ ".rs", " " },
-    .{ ".c", " " },
-    .{ ".cpp", " " },
-    .{ ".h", " " },
-    .{ ".js", " " },
-    .{ ".ts", " " },
-    .{ ".py", " " },
-    .{ ".java", " " },
-    .{ ".md", " " },
-    .{ ".txt", " " },
-    .{ ".png", " " },
-    .{ ".jpg", " " },
-    .{ ".jpeg", " " },
-    .{ ".gif", " " },
-    .{ ".sh", " " },
+    .{ ".zig", "፠ " },
+    .{ ".zon", "፠ " },
+    .{ ".go", "፠ " },
+    .{ ".rs", "፠ " },
+    .{ ".c", "፠ " },
+    .{ ".cpp", "፠ " },
+    .{ ".h", "፠ " },
+    .{ ".js", "፠ " },
+    .{ ".ts", "፠ " },
+    .{ ".py", "፠ " },
+    .{ ".java", "፠ " },
+    .{ ".md", "፠ " },
+    .{ ".txt", "፠ " },
+    .{ ".png", "፠ " },
+    .{ ".jpg", "፠ " },
+    .{ ".jpeg", "፠ " },
+    .{ ".gif", "፠ " },
+    .{ ".sh", "፠ " },
     // default file icon
-    .{ "", " " },
+    .{ "", "፠ " },
 });
 
 const color_inventory = std.StaticStringMap(Terminal.Color).initComptime(.{
-    .{ ".md", Terminal.Color.bright_magenta },
+    .{ ".md", Terminal.Color.bright_cyan },
     .{ ".png", Terminal.Color.bright_cyan },
     .{ ".jpg", Terminal.Color.bright_cyan },
     .{ ".jpeg", Terminal.Color.bright_cyan },
     .{ ".gif", Terminal.Color.bright_cyan },
-    .{ ".sh", Terminal.Color.bright_green },
-    .{ "", Terminal.Color.bright_yellow },
+    .{ ".sh", Terminal.Color.bright_cyan },
+    .{ "", Terminal.Color.bright_cyan },
 });
 
 /// list files in simple mode
@@ -423,7 +423,7 @@ inline fn getTerminalWidth(handle: std.Io.File.Handle) usize {
 
 inline fn getIcon(is_dir: bool, name: []const u8) []const u8 {
     if (is_dir) {
-        return " ";
+        return "፨ ";
     }
 
     const ext = std.fs.path.extension(name);
@@ -432,7 +432,7 @@ inline fn getIcon(is_dir: bool, name: []const u8) []const u8 {
     }
 
     // return default icons based on extension
-    return " ";
+    return "፠ ";
 }
 
 inline fn getColor(is_dir: bool, name: []const u8) Terminal.Color {
@@ -446,7 +446,7 @@ inline fn getColor(is_dir: bool, name: []const u8) Terminal.Color {
     }
 
     // default file color
-    return Terminal.Color.bright_yellow;
+    return Terminal.Color.bright_cyan;
 }
 
 inline fn getGitStatusChar(files: zlist.Files, name: []const u8) ?u8 {

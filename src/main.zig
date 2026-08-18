@@ -255,7 +255,7 @@ fn printNoFiles(io: std.Io, stdout_file: std.Io.File) !void {
     var stdout_buf: [256]u8 = undefined;
     var stdout_writer = stdout_file.writer(io, &stdout_buf);
 
-    try stdout_writer.interface.print(comptime "\n\x1b[93m No files to show.\x1b[0m\n", .{});
+    try stdout_writer.interface.print(comptime "\n No files to show.\n", .{});
     try stdout_writer.interface.flush();
 }
 
